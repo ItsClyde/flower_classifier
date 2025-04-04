@@ -9,6 +9,7 @@ body {
     background-color: #f0f4f8;
     color: #5d576b;
     line-height: 1.6;
+    overflow-x: hidden;
 }
 
 header {
@@ -16,6 +17,7 @@ header {
     background-color: #fff1f5;
     box-shadow: 0 2px 4px rgba(0, 0, 0, 0.05);
     margin-bottom: 2rem;
+    animation: slideIn 0.5s ease-out;
 }
 
 header h1 {
@@ -48,16 +50,18 @@ main {
     border: none;
     border-radius: 5px;
     cursor: pointer;
-    transition: background-color 0.3s ease;
+    transition: transform 0.3s ease, background-color 0.3s ease;
 }
 
 #start-btn:hover {
     background-color: #a8d5cd;
+    transform: scale(1.05);
 }
 
 #start-btn:disabled {
     background-color: #d8e2dc;
     cursor: not-allowed;
+    transform: none;
 }
 
 .webcam-section {
@@ -79,9 +83,10 @@ main {
 .predictions div {
     margin: 1rem 0;
     display: grid;
-    grid-template-columns: 150px 1fr 60px;
+    grid-template-columns: 150px 60px 60px;
     align-items: center;
     gap: 1rem;
+    animation: fadeIn 0.5s ease-out;
 }
 
 .class-name {
@@ -90,22 +95,44 @@ main {
     text-align: left;
 }
 
-.probability-bar {
-    background-color: #f0f4f8;
-    height: 10px;
-    border-radius: 5px;
-    overflow: hidden;
+.confidence-meter {
+    position: relative;
 }
 
-.progress {
-    height: 100%;
-    background-color: #fad2e1;
-    transition: width 0.3s ease;
+.meter-bg {
+    fill: none;
+    stroke: #f0f4f8;
+    stroke-width: 5;
+}
+
+.meter-fill {
+    fill: none;
+    stroke: #fad2e1;
+    stroke-width: 5;
+    stroke-linecap: round;
+    transform: rotate(-90deg);
+    transform-origin: 50% 50%;
+    transition: stroke-dasharray 0.5s ease;
 }
 
 .probability-value {
     color: #b8a9c9;
     font-size: 0.9rem;
+    text-align: center;
+}
+
+.fun-fact {
+    margin-top: 1.5rem;
+    text-align: center;
+}
+
+.fact-text {
+    font-style: italic;
+    color: #89b0ae;
+    background-color: #fff1f5;
+    padding: 0.5rem 1rem;
+    border-radius: 5px;
+    display: inline-block;
 }
 
 footer {
@@ -129,4 +156,20 @@ footer a:hover {
 
 footer p {
     margin: 0.3rem 0;
+}
+
+/* Animations */
+@keyframes slideIn {
+    from { transform: translateY(-20px); opacity: 0; }
+    to { transform: translateY(0); opacity: 1; }
+}
+
+@keyframes fadeIn {
+    from { opacity: 0; }
+    to { opacity: 1; }
+}
+
+@keyframes animateIn {
+    from { transform: translateY(10px); opacity: 0; }
+    to { transform: translateY(0); opacity: 1; }
 }
