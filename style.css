@@ -6,26 +6,26 @@
 
 body {
     font-family: 'Segoe UI', Arial, sans-serif;
-    background-color: #f0f4f8; /* Pastel light blue-gray */
-    color: #5d576b; /* Soft purple-gray */
+    background-color: #f0f4f8;
+    color: #5d576b;
     line-height: 1.6;
 }
 
 header {
     padding: 2rem;
-    background-color: #fff1f5; /* Pastel pink */
+    background-color: #fff1f5;
     box-shadow: 0 2px 4px rgba(0, 0, 0, 0.05);
     margin-bottom: 2rem;
 }
 
 header h1 {
     font-size: 2.5rem;
-    color: #89b0ae; /* Pastel teal */
+    color: #89b0ae;
     margin-bottom: 0.5rem;
 }
 
 header p {
-    color: #b8a9c9; /* Pastel lavender */
+    color: #b8a9c9;
     font-size: 1.1rem;
 }
 
@@ -38,12 +38,31 @@ main {
 .controls {
     text-align: center;
     margin-bottom: 2rem;
+    display: flex;
+    justify-content: center;
+    gap: 1rem;
+    align-items: center;
+}
+
+#camera-facing {
+    padding: 0.7rem;
+    font-size: 1rem;
+    background-color: #fff1f5;
+    border: 1px solid #d8e2dc;
+    border-radius: 5px;
+    color: #5d576b;
+    cursor: pointer;
+}
+
+#camera-facing:disabled {
+    background-color: #d8e2dc;
+    cursor: not-allowed;
 }
 
 #start-btn {
     padding: 0.8rem 2rem;
     font-size: 1.1rem;
-    background-color: #bee3db; /* Pastel mint */
+    background-color: #bee3db;
     color: #5d576b;
     border: none;
     border-radius: 5px;
@@ -52,11 +71,11 @@ main {
 }
 
 #start-btn:hover {
-    background-color: #a8d5cd; /* Slightly darker pastel mint */
+    background-color: #a8d5cd;
 }
 
 #start-btn:disabled {
-    background-color: #d8e2dc; /* Pastel gray */
+    background-color: #d8e2dc;
     cursor: not-allowed;
 }
 
@@ -86,12 +105,12 @@ main {
 
 .class-name {
     font-weight: 500;
-    color: #89b0ae; /* Pastel teal */
+    color: #89b0ae;
     text-align: left;
 }
 
 .probability-bar {
-    background-color: #f0f4f8; /* Pastel light blue-gray */
+    background-color: #f0f4f8;
     height: 10px;
     border-radius: 5px;
     overflow: hidden;
@@ -99,12 +118,12 @@ main {
 
 .progress {
     height: 100%;
-    background-color: #fad2e1; /* Pastel pink */
+    background-color: #fad2e1;
     transition: width 0.3s ease;
 }
 
 .probability-value {
-    color: #b8a9c9; /* Pastel lavender */
+    color: #b8a9c9;
     font-size: 0.9rem;
 }
 
@@ -112,19 +131,19 @@ footer {
     margin-top: 2rem;
     padding: 1.5rem;
     text-align: center;
-    background-color: #fff1f5; /* Pastel pink */
+    background-color: #fff1f5;
     color: #5d576b;
     font-size: 0.9rem;
 }
 
 footer a {
-    color: #89b0ae; /* Pastel teal */
+    color: #89b0ae;
     text-decoration: none;
     transition: color 0.3s ease;
 }
 
 footer a:hover {
-    color: #a8d5cd; /* Slightly darker pastel mint */
+    color: #a8d5cd;
 }
 
 footer p {

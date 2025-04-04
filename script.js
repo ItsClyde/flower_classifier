@@ -11,9 +11,11 @@ async function init() {
         model = await tmImage.load(modelURL, metadataURL);
         maxPredictions = model.getTotalClasses();
 
-        // Setup webcam
-        const flip = true;
-        webcam = new tmImage.Webcam(300, 300, flip);
+        // Get selected camera facing direction
+        const facingMode = document.getElementById("camera-facing").value;
+
+        // Setup webcam with selected facing mode
+        webcam = new tmImage.Webcam(300, 300, true, { facingMode: facingMode });
         await webcam.setup();
         await webcam.play();
         window.requestAnimationFrame(loop);
@@ -28,8 +30,10 @@ async function init() {
         }
         
         document.getElementById("start-btn").disabled = true;
+        document.getElementById("camera-facing").disabled = true; // Disable dropdown after start
     } catch (error) {
         console.error("Error initializing the classifier:", error);
+        alert("Failed to initialize webcam. Please check camera permissions.");
     }
 }
 
