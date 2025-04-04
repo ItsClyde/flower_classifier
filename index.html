@@ -15,21 +15,40 @@
     <main>
         <section class="controls">
             <button type="button" onclick="init()" id="start-btn">Start Classification</button>
+            <div class="threshold-control">
+                <label for="confidence-threshold">Confidence Threshold: <span id="threshold-value">80%</span></label>
+                <input type="range" id="confidence-threshold" min="50" max="95" value="80" step="5">
+            </div>
         </section>
         
-        <section class="webcam-section">
-            <div id="webcam-container"></div>
+        <section class="content">
+            <div class="webcam-section">
+                <div id="webcam-container"></div>
+                <button type="button" onclick="snapshot()" id="snapshot-btn" disabled>Snapshot</button>
+                <div id="error-feedback" class="error-feedback"></div>
+            </div>
+            <aside class="history">
+                <h3>Prediction History</h3>
+                <ul id="history-list"></ul>
+            </aside>
+        </section>
+
+        <section class="predictions-section">
+            <h3>Predictions</h3>
             <div id="label-container" class="predictions"></div>
         </section>
     </main>
 
-    <!-- Popup -->
     <div id="popup" class="popup">
         <div class="popup-content">
-            <span id="close-popup" class="close">&times;</span>
+            <span id="close-popup" class="close">×</span>
             <h2 id="popup-title"></h2>
             <p id="popup-fact"></p>
         </div>
+    </div>
+
+    <div id="loading" class="loading">
+        <div class="spinner"></div>
     </div>
 
     <footer>
@@ -38,7 +57,6 @@
         <p>Email: <a href="mailto:dgcello@unp.edu.ph">dgcello@unp.edu.ph</a></p>
     </footer>
 
-    <!-- Optional sound (uncomment and add a ding.mp3 file if desired) -->
     <audio id="ding" src="ding-36029.mp3"></audio>
 
     <script src="https://cdn.jsdelivr.net/npm/@tensorflow/tfjs@latest/dist/tf.min.js"></script>

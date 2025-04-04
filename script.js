@@ -1,8 +1,11 @@
 const URL = "./my_model/";
 
 let model, webcam, labelContainer, maxPredictions;
+let lastTopFlower = "";
+let stableCount = 0;
+let popupCooldown = 0;
+let history = [];
 
-// Expanded fun facts database (customize with your flower classes!)
 const flowerFacts = {
     "Rose": "Roses have been cultivated for over 5,000 years and symbolize love!",
     "Tulip": "Tulips were once more valuable than gold in 17th-century Holland!",
@@ -13,31 +16,30 @@ const flowerFacts = {
     "Default": "Not sure what this is, but flowers brighten any day!"
 };
 
-// Detect if the device is mobile
 function isMobileDevice() {
     return /Android|webOS|iPhone|iPad|iPod|BlackBerry|IEMobile|Opera Mini/i.test(navigator.userAgent);
 }
 
-// Get a fun fact based on the flower
 function getFunFact(flowerName) {
     return flowerFacts[flowerName] || flowerFacts["Default"];
 }
 
-// Show popup with title and fact
 function showPopup(title, fact) {
     const popup = document.getElementById("popup");
     document.getElementById("popup-title").textContent = title;
     document.getElementById("popup-fact").textContent = fact;
     popup.style.display = "block";
+    popupCooldown = Date.now() + 5000;
+    document.getElementById("ding").play();
 }
 
-// Hide popup
 document.getElementById("close-popup").onclick = function() {
     document.getElementById("popup").style.display = "none";
 };
 
 async function init() {
     try {
+        document.getElementById("loading").style.display = "flex";
         const modelURL = URL + "model.json";
         const metadataURL = URL + "metadata.json";
 
@@ -49,16 +51,16 @@ async function init() {
             document.getElementById("webcam-container").innerHTML = "";
         }
 
-        const preferredFacingMode = isMobileDevice() ? "environment" : "user";
+        const constraints = isMobileDevice() ? { facingMode: "environment" } : { facingMode: "user" };
         try {
-            webcam = new tmImage.Webcam(300, 300, false, { facingMode: preferredFacingMode });
-            await webcam.setup({ facingMode: preferredFacingMode });
+            webcam = new tmImage.Webcam(300, 300, false, constraints);
+            await webcam.setup(constraints);
             await webcam.play();
         } catch (error) {
-            console.warn(`Failed to initialize ${preferredFacingMode} camera:`, error);
-            const fallbackFacingMode = preferredFacingMode === "environment" ? "user" : "environment";
-            webcam = new tmImage.Webcam(300, 300, false, { facingMode: fallbackFacingMode });
-            await webcam.setup({ facingMode: fallbackFacingMode });
+            console.warn(`Failed to initialize preferred camera:`, error);
+            const fallbackConstraints = { facingMode: "user" };
+            webcam = new tmImage.Webcam(300, 300, false, fallbackConstraints);
+            await webcam.setup(fallbackConstraints);
             await webcam.play();
         }
 
@@ -70,10 +72,13 @@ async function init() {
         }
         
         document.getElementById("start-btn").disabled = true;
+        document.getElementById("snapshot-btn").disabled = false;
+        document.getElementById("loading").style.display = "none";
         window.requestAnimationFrame(loop);
     } catch (error) {
         console.error("Error initializing the classifier:", error);
         alert("Failed to initialize webcam. Please ensure camera permissions are granted and a camera is available.");
+        document.getElementById("loading").style.display = "none";
     }
 }
 
@@ -94,13 +99,14 @@ async function predict() {
             <span class="class-name">${prediction[i].className}</span>
             <div class="confidence-meter">
                 <svg width="50" height="50">
-                    <circle class="meter-bg" cx="25" cy="25" r="20"></circle>
-                    <circle class="meter-fill" cx="25" cy="25" r="20" stroke-dasharray="${probability * 2.51327}, 125.6637"></circle>
+                    <circle class="meter-bg" cx="25" cy="25" r="20" stroke-width="5" fill="none"></circle>
+                    <circle class="meter-fill" cx="25" cy="25" r="20" stroke-width="5" stroke-dasharray="${probability * 2.51327}, 125.6637" fill="none"></circle>
                 </svg>
             </div>
             <span class="probability-value">${probability}%</span>
         `;
         labelContainer.childNodes[i].innerHTML = classPrediction;
+        labelContainer.childNodes[i].classList.remove("top-prediction");
 
         if (prediction[i].probability > highestProb) {
             highestProb = prediction[i].probability;
@@ -108,12 +114,53 @@ async function predict() {
         }
     }
 
-    // Show popup based on confidence
-    if (highestProb > 0.7) { // 70% confidence threshold
-        showPopup(`Identified: ${topFlower}`, getFunFact(topFlower));
-        // Uncomment the next line if you add the audio element and a ding.mp3 file
-        document.getElementById("ding").play();
+    const topIndex = Array.from(prediction).findIndex(p => p.className === topFlower);
+    labelContainer.childNodes[topIndex].classList.add("top-prediction");
+
+    const threshold = document.getElementById("confidence-threshold").value / 100;
+    if (highestProb > threshold) {
+        if (topFlower === lastTopFlower) {
+            stableCount++;
+            document.getElementById("error-feedback").textContent = "";
+        } else {
+            stableCount = 0;
+            lastTopFlower = topFlower;
+        }
     } else {
-        showPopup("Hmm, what's this?", getFunFact("Default"));
+        stableCount = 0;
+        lastTopFlower = "";
+        document.getElementById("error-feedback").textContent = "No flower detected";
     }
 }
+
+async function snapshot() {
+    const prediction = await model.predict(webcam.canvas);
+    let highestProb = 0;
+    let topFlower = "";
+
+    for (let i = 0; i < maxPredictions; i++) {
+        if (prediction[i].probability > highestProb) {
+            highestProb = prediction[i].probability;
+            topFlower = prediction[i].className;
+        }
+    }
+
+    const threshold = document.getElementById("confidence-threshold").value / 100;
+    if (highestProb > threshold && Date.now() > popupCooldown) {
+        showPopup(`Identified: ${topFlower}`, getFunFact(topFlower));
+        addToHistory(topFlower, highestProb);
+    }
+}
+
+function addToHistory(flower, probability) {
+    history.unshift({ flower, probability: (probability * 100).toFixed(1) });
+    if (history.length > 5) history.pop();
+    const historyList = document.getElementById("history-list");
+    historyList.innerHTML = history.map(item => 
+        `<li>${item.flower}: ${item.probability}%</li>`
+    ).join("");
+}
+
+document.getElementById("confidence-threshold").addEventListener("input", function() {
+    document.getElementById("threshold-value").textContent = `${this.value}%`;
+});

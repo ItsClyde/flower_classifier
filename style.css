@@ -17,6 +17,7 @@ header {
     background-color: #fff1f5;
     box-shadow: 0 2px 4px rgba(0, 0, 0, 0.05);
     margin-bottom: 2rem;
+    text-align: center;
     animation: slideIn 0.5s ease-out;
 }
 
@@ -32,14 +33,18 @@ header p {
 }
 
 main {
-    max-width: 800px;
+    max-width: 1000px;
     margin: 0 auto;
-    padding: 0 1rem;
+    padding: 0 2rem;
 }
 
 .controls {
     text-align: center;
     margin-bottom: 2rem;
+    padding: 1rem;
+    background-color: #ffffff;
+    border-radius: 8px;
+    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.05);
 }
 
 #start-btn {
@@ -64,11 +69,28 @@ main {
     transform: none;
 }
 
+.threshold-control {
+    margin-top: 1rem;
+}
+
+#confidence-threshold {
+    width: 200px;
+    margin-top: 0.5rem;
+}
+
+.content {
+    display: flex;
+    gap: 2rem;
+    margin-bottom: 2rem;
+}
+
 .webcam-section {
+    flex: 2;
     background-color: #ffffff;
-    padding: 1.5rem;
+    padding: 2rem;
     border-radius: 8px;
     box-shadow: 0 2px 4px rgba(0, 0, 0, 0.05);
+    text-align: center;
 }
 
 #webcam-container {
@@ -76,17 +98,93 @@ main {
     width: 300px;
 }
 
+#snapshot-btn {
+    padding: 0.8rem 2rem;
+    font-size: 1.1rem;
+    background-color: #bee3db;
+    color: #5d576b;
+    border: none;
+    border-radius: 5px;
+    cursor: pointer;
+    transition: transform 0.3s ease, background-color 0.3s ease;
+    margin: 1rem auto;
+    display: inline-block;
+}
+
+#snapshot-btn:hover {
+    background-color: #a8d5cd;
+    transform: scale(1.05);
+}
+
+#snapshot-btn:disabled {
+    background-color: #d8e2dc;
+    cursor: not-allowed;
+    transform: none;
+}
+
+.error-feedback {
+    color: #b8a9c9;
+    font-size: 0.9rem;
+    margin: 0.5rem 0;
+}
+
+.history {
+    flex: 1;
+    background-color: #fff1f5;
+    padding: 1.5rem;
+    border-radius: 8px;
+    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.05);
+    min-width: 200px;
+}
+
+.history h3 {
+    color: #89b0ae;
+    font-size: 1.2rem;
+    margin-bottom: 1rem;
+}
+
+.history ul {
+    list-style: none;
+    padding: 0;
+}
+
+.history li {
+    color: #5d576b;
+    font-size: 0.9rem;
+    margin: 0.5rem 0;
+}
+
+.predictions-section {
+    background-color: #ffffff;
+    padding: 2rem;
+    border-radius: 8px;
+    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.05);
+}
+
+.predictions-section h3 {
+    color: #89b0ae;
+    font-size: 1.2rem;
+    margin-bottom: 1rem;
+}
+
 .predictions {
-    margin-top: 1.5rem;
+    margin-top: 0;
 }
 
 .predictions div {
     margin: 1rem 0;
     display: grid;
-    grid-template-columns: 150px 60px 60px;
+    grid-template-columns: 200px 60px 60px;
     align-items: center;
     gap: 1rem;
-    animation: fadeIn 0.5s ease-out;
+    padding: 0.5rem;
+    border-radius: 5px;
+    transition: box-shadow 0.3s ease, background-color 0.3s ease;
+}
+
+.top-prediction {
+    box-shadow: 0 0 10px #fad2e1;
+    background-color: rgba(250, 210, 225, 0.2);
 }
 
 .class-name {
@@ -99,16 +197,19 @@ main {
     position: relative;
 }
 
+.confidence-meter svg {
+    display: block;
+}
+
 .meter-bg {
     fill: none;
-    stroke: #f0f4f8;
+    stroke: #89b0ae;
     stroke-width: 5;
 }
 
-/* Tweaked color: changed #fad2e1 (pink) to #d4a5f5 (soft purple) */
 .meter-fill {
     fill: none;
-    stroke: #d4a5f5;
+    stroke: #fad2e1;
     stroke-width: 5;
     stroke-linecap: round;
     transform: rotate(-90deg);
@@ -122,7 +223,6 @@ main {
     text-align: center;
 }
 
-/* Popup styles */
 .popup {
     display: none;
     position: fixed;
@@ -165,6 +265,28 @@ main {
     font-style: italic;
 }
 
+.loading {
+    display: none;
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background-color: rgba(0, 0, 0, 0.3);
+    z-index: 1000;
+    justify-content: center;
+    align-items: center;
+}
+
+.spinner {
+    width: 50px;
+    height: 50px;
+    border: 5px solid #d8e2dc;
+    border-top: 5px solid #89b0ae;
+    border-radius: 50%;
+    animation: spin 1s linear infinite;
+}
+
 footer {
     margin-top: 2rem;
     padding: 1.5rem;
@@ -188,7 +310,6 @@ footer p {
     margin: 0.3rem 0;
 }
 
-/* Animations */
 @keyframes slideIn {
     from { transform: translateY(-20px); opacity: 0; }
     to { transform: translateY(0); opacity: 1; }
@@ -202,4 +323,9 @@ footer p {
 @keyframes popupIn {
     from { transform: scale(0.8); opacity: 0; }
     to { transform: scale(1); opacity: 1; }
+}
+
+@keyframes spin {
+    0% { transform: rotate(0deg); }
+    100% { transform: rotate(360deg); }
 }
