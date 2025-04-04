@@ -14,9 +14,15 @@ async function init() {
         // Get selected camera facing direction
         const facingMode = document.getElementById("camera-facing").value;
 
+        // If webcam exists, stop it first
+        if (webcam) {
+            await webcam.stop();
+            document.getElementById("webcam-container").innerHTML = ""; // Clear previous canvas
+        }
+
         // Setup webcam with selected facing mode
-        webcam = new tmImage.Webcam(300, 300, true, { facingMode: facingMode });
-        await webcam.setup();
+        webcam = new tmImage.Webcam(300, 300, false, { facingMode: facingMode });
+        await webcam.setup({ facingMode: facingMode }); // Explicitly pass constraints
         await webcam.play();
         window.requestAnimationFrame(loop);
 
@@ -30,10 +36,10 @@ async function init() {
         }
         
         document.getElementById("start-btn").disabled = true;
-        document.getElementById("camera-facing").disabled = true; // Disable dropdown after start
+        document.getElementById("camera-facing").disabled = true;
     } catch (error) {
         console.error("Error initializing the classifier:", error);
-        alert("Failed to initialize webcam. Please check camera permissions.");
+        alert("Failed to initialize webcam. Please ensure camera permissions are granted and try again.");
     }
 }
 
