@@ -2,6 +2,11 @@ const URL = "./my_model/";
 
 let model, webcam, labelContainer, maxPredictions;
 
+// Function to detect if the device is mobile
+function isMobileDevice() {
+    return /Android|webOS|iPhone|iPad|iPod|BlackBerry|IEMobile|Opera Mini/i.test(navigator.userAgent);
+}
+
 async function init() {
     try {
         const modelURL = URL + "model.json";
@@ -14,14 +19,25 @@ async function init() {
         // If webcam exists, stop it first
         if (webcam) {
             await webcam.stop();
-            document.getElementById("webcam-container").innerHTML = ""; // Clear previous canvas
+            document.getElementById("webcam-container").innerHTML = "";
         }
 
-        // Force back camera (environment facing mode)
-        webcam = new tmImage.Webcam(300, 300, false, { facingMode: "environment" });
-        await webcam.setup({ facingMode: "environment" }); // Explicitly set back camera
-        await webcam.play();
-        window.requestAnimationFrame(loop);
+        // Choose camera based on device type
+        const preferredFacingMode = isMobileDevice() ? "environment" : "user"; // Back cam for mobile, front for laptop
+
+        // Try preferred camera first
+        try {
+            webcam = new tmImage.Webcam(300, 300, false, { facingMode: preferredFacingMode });
+            await webcam.setup({ facingMode: preferredFacingMode });
+            await webcam.play();
+        } catch (error) {
+            console.warn(`Failed to initialize ${preferredFacingMode} camera:`, error);
+            // Fallback to the other camera if the preferred one fails
+            const fallbackFacingMode = preferredFacingMode === "environment" ? "user" : "environment";
+            webcam = new tmImage.Webcam(300, 300, false, { facingMode: fallbackFacingMode });
+            await webcam.setup({ facingMode: fallbackFacingMode });
+            await webcam.play();
+        }
 
         // Append webcam canvas
         document.getElementById("webcam-container").appendChild(webcam.canvas);
@@ -35,7 +51,7 @@ async function init() {
         document.getElementById("start-btn").disabled = true;
     } catch (error) {
         console.error("Error initializing the classifier:", error);
-        alert("Failed to initialize back camera. Please ensure camera permissions are granted and your device supports a rear camera.");
+        alert("Failed to initialize webcam. Please ensure camera permissions are granted and a camera is available.");
     }
 }
 
