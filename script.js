@@ -2,14 +2,15 @@ const URL = "./my_model/";
 
 let model, webcam, labelContainer, maxPredictions;
 
-// Fun facts database (add more based on your flower classes!)
+// Expanded fun facts database (customize with your flower classes!)
 const flowerFacts = {
     "Rose": "Roses have been cultivated for over 5,000 years and symbolize love!",
     "Tulip": "Tulips were once more valuable than gold in 17th-century Holland!",
     "Sunflower": "Sunflowers can grow up to 12 feet tall and follow the sun!",
     "Daisy": "Daisies are actually two flowers in one—a white and a yellow one!",
-    // Add your own flower classes and facts here
-    "Default": "Flowers have been inspiring art and poetry for centuries!"
+    "Lily": "Lilies are known as the flower of purity and can live for years!",
+    "Orchid": "Orchids can bloom for up to 3 months and come in over 25,000 species!",
+    "Default": "Not sure what this is, but flowers brighten any day!"
 };
 
 // Detect if the device is mobile
@@ -17,10 +18,23 @@ function isMobileDevice() {
     return /Android|webOS|iPhone|iPad|iPod|BlackBerry|IEMobile|Opera Mini/i.test(navigator.userAgent);
 }
 
-// Get a random fun fact based on the flower
+// Get a fun fact based on the flower
 function getFunFact(flowerName) {
     return flowerFacts[flowerName] || flowerFacts["Default"];
 }
+
+// Show popup with title and fact
+function showPopup(title, fact) {
+    const popup = document.getElementById("popup");
+    document.getElementById("popup-title").textContent = title;
+    document.getElementById("popup-fact").textContent = fact;
+    popup.style.display = "block";
+}
+
+// Hide popup
+document.getElementById("close-popup").onclick = function() {
+    document.getElementById("popup").style.display = "none";
+};
 
 async function init() {
     try {
@@ -88,17 +102,18 @@ async function predict() {
         `;
         labelContainer.childNodes[i].innerHTML = classPrediction;
 
-        // Track the flower with the highest probability
         if (prediction[i].probability > highestProb) {
             highestProb = prediction[i].probability;
             topFlower = prediction[i].className;
         }
     }
 
-    // Update fun fact for the top prediction
-    if (highestProb > 0.5) { // Only show fact if confidence is above 50%
-        document.getElementById("fun-fact").innerHTML = `<p class="fact-text animate-in">${getFunFact(topFlower)}</p>`;
+    // Show popup based on confidence
+    if (highestProb > 0.7) { // 70% confidence threshold
+        showPopup(`Identified: ${topFlower}`, getFunFact(topFlower));
+        // Uncomment the next line if you add the audio element and a ding.mp3 file
+        document.getElementById("ding").play();
     } else {
-        document.getElementById("fun-fact").innerHTML = "";
+        showPopup("Hmm, what's this?", getFunFact("Default"));
     }
 }

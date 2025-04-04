@@ -20,15 +20,26 @@
         <section class="webcam-section">
             <div id="webcam-container"></div>
             <div id="label-container" class="predictions"></div>
-            <div id="fun-fact" class="fun-fact"></div>
         </section>
     </main>
+
+    <!-- Popup -->
+    <div id="popup" class="popup">
+        <div class="popup-content">
+            <span id="close-popup" class="close">&times;</span>
+            <h2 id="popup-title"></h2>
+            <p id="popup-fact"></p>
+        </div>
+    </div>
 
     <footer>
         <p>Developed by: ItsClyde</p>
         <p>GitHub: <a href="https://github.com/ItsClyde" target="_blank">ItsClyde</a></p>
         <p>Email: <a href="mailto:dgcello@unp.edu.ph">dgcello@unp.edu.ph</a></p>
     </footer>
+
+    <!-- Optional sound (uncomment and add a ding.mp3 file if desired) -->
+    <audio id="ding" src="ding-36029.mp3"></audio>
 
     <script src="https://cdn.jsdelivr.net/npm/@tensorflow/tfjs@latest/dist/tf.min.js"></script>
     <script src="https://cdn.jsdelivr.net/npm/@teachablemachine/image@latest/dist/teachablemachine-image.min.js"></script>
