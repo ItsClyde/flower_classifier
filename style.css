@@ -38,25 +38,6 @@ main {
 .controls {
     text-align: center;
     margin-bottom: 2rem;
-    display: flex;
-    justify-content: center;
-    gap: 1rem;
-    align-items: center;
-}
-
-#camera-facing {
-    padding: 0.7rem;
-    font-size: 1rem;
-    background-color: #fff1f5;
-    border: 1px solid #d8e2dc;
-    border-radius: 5px;
-    color: #5d576b;
-    cursor: pointer;
-}
-
-#camera-facing:disabled {
-    background-color: #d8e2dc;
-    cursor: not-allowed;
 }
 
 #start-btn {

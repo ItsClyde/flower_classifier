@@ -11,18 +11,15 @@ async function init() {
         model = await tmImage.load(modelURL, metadataURL);
         maxPredictions = model.getTotalClasses();
 
-        // Get selected camera facing direction
-        const facingMode = document.getElementById("camera-facing").value;
-
         // If webcam exists, stop it first
         if (webcam) {
             await webcam.stop();
             document.getElementById("webcam-container").innerHTML = ""; // Clear previous canvas
         }
 
-        // Setup webcam with selected facing mode
-        webcam = new tmImage.Webcam(300, 300, false, { facingMode: facingMode });
-        await webcam.setup({ facingMode: facingMode }); // Explicitly pass constraints
+        // Force back camera (environment facing mode)
+        webcam = new tmImage.Webcam(300, 300, false, { facingMode: "environment" });
+        await webcam.setup({ facingMode: "environment" }); // Explicitly set back camera
         await webcam.play();
         window.requestAnimationFrame(loop);
 
@@ -36,10 +33,9 @@ async function init() {
         }
         
         document.getElementById("start-btn").disabled = true;
-        document.getElementById("camera-facing").disabled = true;
     } catch (error) {
         console.error("Error initializing the classifier:", error);
-        alert("Failed to initialize webcam. Please ensure camera permissions are granted and try again.");
+        alert("Failed to initialize back camera. Please ensure camera permissions are granted and your device supports a rear camera.");
     }
 }
 
