@@ -37,6 +37,15 @@ document.getElementById("close-popup").onclick = function() {
     document.getElementById("popup").style.display = "none";
 };
 
+// Function to find DroidCam device
+async function getDroidCamDevice() {
+    const devices = await navigator.mediaDevices.enumerateDevices();
+    return devices.find(device => 
+        device.kind === "videoinput" && 
+        (device.label.includes("DroidCam") || device.label.includes("Android"))
+    );
+}
+
 async function init() {
     try {
         document.getElementById("loading").style.display = "flex";
@@ -51,13 +60,19 @@ async function init() {
             document.getElementById("webcam-container").innerHTML = "";
         }
 
-        const constraints = isMobileDevice() ? { facingMode: "environment" } : { facingMode: "user" };
+        // Try to get DroidCam device first
+        const droidCamDevice = await getDroidCamDevice();
+        const constraints = droidCamDevice 
+            ? { deviceId: { exact: droidCamDevice.deviceId } } 
+            : (isMobileDevice() ? { facingMode: "environment" } : { facingMode: "user" });
+
         try {
             webcam = new tmImage.Webcam(300, 300, false, constraints);
             await webcam.setup(constraints);
             await webcam.play();
         } catch (error) {
-            console.warn(`Failed to initialize preferred camera:`, error);
+            console.warn(`Failed to initialize DroidCam:`, error);
+            // Fallback to default camera
             const fallbackConstraints = { facingMode: "user" };
             webcam = new tmImage.Webcam(300, 300, false, fallbackConstraints);
             await webcam.setup(fallbackConstraints);
@@ -77,7 +92,7 @@ async function init() {
         window.requestAnimationFrame(loop);
     } catch (error) {
         console.error("Error initializing the classifier:", error);
-        alert("Failed to initialize webcam. Please ensure camera permissions are granted and a camera is available.");
+        alert("Failed to initialize webcam. Please ensure camera permissions are granted and DroidCam is running.");
         document.getElementById("loading").style.display = "none";
     }
 }
